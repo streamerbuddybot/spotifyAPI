@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+
+
+message SendSongRequestRequest {
+  string data = 1;
+}
+
+message SendSpotifyRequestResponse {
+  uint32 status = 1;
+  string message = 2;
+  string data = 3;
+
+}
+
+
+
+service SpotifyService {
+ rpc SendEvent(SendSongRequestRequest) returns (SendSpotifyRequestResponse) {}
+}
+
+
+
+
