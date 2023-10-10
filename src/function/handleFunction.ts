@@ -4,9 +4,13 @@ import CheckMessageVariabels from "./CheckMessageVariabels";
 import getSongURI from "./getSongURI";
 
 export async function handleFunction(data: spotifyFunction): Promise<string> {
-  console.log(data.responseMessage);
-  const functionType = data.Function.split(".")[1];
-  switch (functionType) {
+  const messageArray = data.userinput.trim().split(" ");
+
+  console.log(messageArray)
+
+
+
+  switch (data.action) {
     case "songrequest":
       //get the spotify song request settings
       const spotifySettings = await spotifyDB.getStreamerSettings(data.channelID);
@@ -17,17 +21,17 @@ export async function handleFunction(data: spotifyFunction): Promise<string> {
       //check if banned viewers are enabled
       if (spotifySettings.BannedViewers) {
         //check if the user is banned
-        const bannedViewer = await spotifyDB.checkViewerBan(data.channelID, data.viewerID);
+        const bannedViewer = await spotifyDB.checkViewerBan(data.channelID, data.userID);
 
         //if the user is banned return a message
         if (bannedViewer) return "${user.username}, your access for using song request has been restricted.";
       }
 
       //check for missing data
-      if (!data.parts[1]) return "Please provide a song";
+      if (!messageArray) return "Please provide a song";
 
       //get the song uri based of the user input
-      const searchSong = await getSongURI(data.parts[1], data.channelID, data.parts);
+      const searchSong = await getSongURI(data.userinput, data.channelID,);
 
       //if the uri is undefined return a message
       if (!searchSong) return "Sorry I couldn't find that song";
@@ -60,22 +64,13 @@ export async function handleFunction(data: spotifyFunction): Promise<string> {
       if (!songDetails) return "song is added to the queue but I couldn't get the song details";
 
       //replace the song request message variables with the song details
-      const message = CheckMessageVariabels(data.responseMessage, songDetails, data.channelID);
+      const message = CheckMessageVariabels(data.message, songDetails, data.channelID);
 
       //return the message
       return message;
 
     default:
-      return `${data.Function} not found`;
+      return `${data.action} not found`;
   }
 }
 
-interface spotifyFunction {
-  channel: string;
-  channelID: number;
-  viewerID: number;
-  parts: string[];
-  user: string;
-  responseMessage: string;
-  Function: string;
-}

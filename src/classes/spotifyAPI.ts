@@ -129,6 +129,7 @@ class SpotifyWebApi {
 
   //search for a song based of query
   public async searchSong(channelID: number, query: string) {
+    console.log(`searching for ${query}`	)
     try {
       const res = await spotifyAPI.get<SearchResponse>(`/search?q=${query}&type=track&limit=1`, {
         headers: await this.Headers(channelID),
@@ -136,7 +137,7 @@ class SpotifyWebApi {
       });
       return res.data;
     } catch (error: any) {
-      // console.log(error.response.data);
+      console.log(error.response.data);
     }
   }
 }

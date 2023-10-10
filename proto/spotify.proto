@@ -2,21 +2,24 @@ syntax = "proto3";
 
 
 
-message SendSongRequestRequest {
-  string data = 1;
+message spotifyRequest {
+  int32 channelID = 1;
+  int32 userID = 2;
+  string userinput = 3;
+  string message = 4;
+  string action = 5;
 }
 
-message SendSpotifyRequestResponse {
+message spotifyResponse {
   uint32 status = 1;
-  string message = 2;
-  string data = 3;
+  string responseMessage = 2; 
 
 }
 
 
 
 service SpotifyService {
- rpc SendEvent(SendSongRequestRequest) returns (SendSpotifyRequestResponse) {}
+ rpc SendEvent(spotifyRequest) returns (spotifyResponse) {}
 }
 
 

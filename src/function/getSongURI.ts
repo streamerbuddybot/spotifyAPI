@@ -1,6 +1,6 @@
 import { spotifyClient } from "../classes/spotifyAPI";
 
-export default async function (string: string, channelID: number, parts: string[]): Promise<returnData | void> {
+export default async function (string: string, channelID: number, ): Promise<returnData | void> {
   if (string.startsWith("spotify:")) {
     // const id = string.substring(14, 39);
     const URI = string;
@@ -12,11 +12,8 @@ export default async function (string: string, channelID: number, parts: string[
     const URI = `spotify:track:${id}`;
     return { URI, id };
   } else {
-    const searchQuery = parts.slice(1).join(" ");
-    if (!searchQuery) return 
 
-    const spotfyData = await spotifyClient.searchSong(channelID, searchQuery);
-    console.log(spotfyData)
+    const spotfyData = await spotifyClient.searchSong(channelID, string);
     if (!spotfyData || spotfyData.tracks?.total === 0) return 
     const URI = spotfyData.tracks?.items[0].uri;
     const id = spotfyData.tracks?.items[0].id;

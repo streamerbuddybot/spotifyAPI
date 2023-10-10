@@ -1,0 +1,59 @@
+name: Update Package.json Version and Build/Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to GitHub Container Registry
+        run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Update IMAGE Version
+        run: |
+          sed -i "s|image: ghcr.io/${{ github.repository }}:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|" kubernetes/resources/deployment.yaml
+          #log the changes to the deployment.yaml file
+          cat kubernetes/resources/deployment.yaml
+          
+
+      - name: push updated deployment.yaml
+        run: |
+          git config --global user.email "jochem1111@gmail.com"
+          git config --global user.name "Jochemwhite(github actions))"
+          git add kubernetes/resources/deployment.yaml
+          git commit -m "Update deployment.yaml"
+          git push
+
+      - name: install dependencies
+        run: npm install
+
+      - name: compile typescript
+        run: npm run build
+
+      
+      - name: Build and push Docker image to GHCR
+        run: |
+          DOCKER_TAG="ghcr.io/${{ github.repository }}:${{ github.workflow_sha }}"
+          docker build -t $DOCKER_TAG .
+          docker push $DOCKER_TAG     
+
+
+   
+
+
+    
+        
+
+
+
+            
