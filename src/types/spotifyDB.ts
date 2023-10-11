@@ -6,6 +6,7 @@ export interface SpotifyStreammerSetting {
   BannedSongs: boolean;
   BannedViewers: boolean;
   MaxUserQueueEnabled: boolean;
+  OnlyWhenOnline: boolean;
 }
 
 export interface SpotifyStreammerSettingStorage extends Models.Document, SpotifyStreammerSetting {}
@@ -16,6 +17,7 @@ export interface SpotifyIntergration {
   accessToken: string;
   refreshToken: string;
   channelID: number;
+
 }
 
 export interface SpotifyIntergrationStorage extends Models.Document, SpotifyIntergration {}

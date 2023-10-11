@@ -7,22 +7,24 @@ import getSongURI from "./getSongURI";
 export async function handleFunction(data: spotifyFunction): Promise<string> {
   const messageArray = data.userinput.trim().split(" ");
 
-  console.log(messageArray)
-
-
 
   switch (data.action) {
     case "songrequest":
-      const isLive = await TwitchDBHandler.getStreamerLiveStatus(data.channelID.toString());
-
-      if(!isLive) return "Sorry but the streamer is not live at the moment";
-
 
       //get the spotify song request settings
       const spotifySettings = await spotifyDB.getStreamerSettings(data.channelID);
 
       //check if we have the spotify settings
       if (!spotifySettings) return "Please set up your spotify integration";
+
+      //check OnlyWhenOnline is enabled
+      if (spotifySettings.OnlyWhenOnline) {
+        //get the streamer live status
+        const isLive = await TwitchDBHandler.getStreamerLiveStatus(data.channelID.toString());
+
+        //if the streamer is offline return a message
+        if (!isLive) return "Sorry I can't take song requests right now";
+      }
 
       //check if banned viewers are enabled
       if (spotifySettings.BannedViewers) {
