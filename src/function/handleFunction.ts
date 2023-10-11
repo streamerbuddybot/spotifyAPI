@@ -1,3 +1,4 @@
+import { TwitchDBHandler } from "../classes/TwitchDB";
 import { spotifyDB } from "../classes/database";
 import { spotifyClient } from "../classes/spotifyAPI";
 import CheckMessageVariabels from "./CheckMessageVariabels";
@@ -12,6 +13,11 @@ export async function handleFunction(data: spotifyFunction): Promise<string> {
 
   switch (data.action) {
     case "songrequest":
+      const isLive = await TwitchDBHandler.getStreamerLiveStatus(data.channelID.toString());
+
+      if(!isLive) return "Sorry but the streamer is not live at the moment";
+
+
       //get the spotify song request settings
       const spotifySettings = await spotifyDB.getStreamerSettings(data.channelID);
 
