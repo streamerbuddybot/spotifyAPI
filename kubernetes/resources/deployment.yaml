@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: streamwizard-backend-spotifyapi
-          image: ghcr.io/streamerbuddybot/spotifyapi:a2f2593e7409aee7998f70495c8af66983c6e721
+          image: ghcr.io/streamerbuddybot/spotifyapi:be46adbd3dc6f5db22e4bb29d797938c98196dc9
           ports:
             - containerPort: 80
           envFrom:
