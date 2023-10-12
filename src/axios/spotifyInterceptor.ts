@@ -30,8 +30,10 @@ spotifyAPI.interceptors.response.use(
     //originalRequest
     const originalRequest = error.config;
 
+    const maxRetry = 2
+    let retryCount = 0;
     //if the error status = 401 we update the token and retry
-    if (error.response.status === 401 || (error.response.status === 503 && !originalRequest._retry)) {
+    if (error.response.status === 401 && !originalRequest._retry || (error.response.status === 503 )) {
       originalRequest._retry = true;
 
       //get the channel from the request

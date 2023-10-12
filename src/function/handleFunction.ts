@@ -1,16 +1,16 @@
 import { TwitchDBHandler } from "../classes/TwitchDB";
 import { spotifyDB } from "../classes/database";
 import { spotifyClient } from "../classes/spotifyAPI";
+import { spotifyQueue, spotifyQueueResponse, spotifySongDetails, spotifySongDetailsResponse } from "../proto/spotify";
 import CheckMessageVariabels from "./CheckMessageVariabels";
+import { isCheckingCurrentSong, startCheckingCurrentSong } from "./checkSong";
 import getSongURI from "./getSongURI";
 
 export async function handleFunction(data: spotifyFunction): Promise<string> {
   const messageArray = data.userinput.trim().split(" ");
 
-
   switch (data.action) {
     case "songrequest":
-
       //get the spotify song request settings
       const spotifySettings = await spotifyDB.getStreamerSettings(data.channelID);
 
@@ -39,7 +39,7 @@ export async function handleFunction(data: spotifyFunction): Promise<string> {
       if (!messageArray) return "Please provide a song";
 
       //get the song uri based of the user input
-      const searchSong = await getSongURI(data.userinput, data.channelID,);
+      const searchSong = await getSongURI(data.userinput, data.channelID);
 
       //if the uri is undefined return a message
       if (!searchSong) return "Sorry I couldn't find that song";
@@ -71,6 +71,29 @@ export async function handleFunction(data: spotifyFunction): Promise<string> {
       //if we can't get the song details return a message
       if (!songDetails) return "song is added to the queue but I couldn't get the song details";
 
+      //check if the interval is running
+      if (isCheckingCurrentSong(data.channelID)) {
+        //add the song to the database queue
+        await spotifyDB.addSongToQueue({
+          channelID: data.channelID,
+          requested_by: data.username,
+          songname: songDetails!.name,
+          songID: songDetails!.id,
+          userID: data.userID,
+        });
+      } else {
+        //add the song to the database queue
+        await spotifyDB.addSongToQueue({
+          channelID: data.channelID,
+          requested_by: data.username,
+          songname: songDetails!.name,
+          songID: songDetails!.id,
+          userID: data.userID,
+        });
+        //start the interval
+        startCheckingCurrentSong(data.channelID);
+      }
+
       //replace the song request message variables with the song details
       const message = CheckMessageVariabels(data.message, songDetails, data.channelID);
 
@@ -82,3 +105,56 @@ export async function handleFunction(data: spotifyFunction): Promise<string> {
   }
 }
 
+export async function getSongDetails(channelID: number): Promise<spotifySongDetails | null> {
+  const songDetails = await spotifyClient.getPlaybackState(channelID);
+
+  if (!songDetails) return null;
+
+  const volume = songDetails.device?.volume_percent ?? undefined;
+  const progress = songDetails.progress_ms ?? undefined;
+
+  const response = new spotifySongDetails({
+    album: songDetails.item.album.name,
+    duration: songDetails.item.duration_ms,
+    artist: songDetails.item.artists[0].name,
+    song: songDetails.item.name,
+    imageURL: songDetails.item.album.images[0].url,
+    isPlaying: songDetails.is_playing,
+    release_date: songDetails.item.album.release_date,
+    songID: songDetails.item.id,
+    songURL: songDetails.item.external_urls.spotify,
+    volume: volume,
+    progress: progress,
+  });
+  return response;
+}
+
+export async function getQueue(channelID: number) {
+  const res = await spotifyDB.getQueue(channelID);
+
+
+  if(!res) return new spotifyQueueResponse({status: 500, statusMessage: "something went wrong"})
+
+  if(res.total === 0) return new spotifyQueueResponse({status: 200, statusMessage: "queue is empty", totalSongs: res.total})
+
+  const queue = res.documents.map((song) => {
+    return new spotifyQueue({
+      channelID: song.channelID,
+      requested_by: song.requested_by,
+      songname: song.songname,
+      songID: song.songID,
+      userID: song.userID,
+    });
+  });
+
+  console.log(queue)
+
+  const queueReponse = new spotifyQueueResponse({
+    status: 200,
+    statusMessage: "success",
+    queue: queue,
+    totalSongs: res.total,
+  });
+
+  return queueReponse;
+}

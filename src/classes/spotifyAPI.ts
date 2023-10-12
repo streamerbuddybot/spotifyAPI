@@ -3,7 +3,7 @@ import { spotifyAPI } from "../axios/spotifyInterceptor";
 import qs from "qs";
 import { spotifyTokensDB } from "./database";
 import dotenv from "dotenv";
-import { SearchResponse, SingleTrackResponse, UsersQueueResponse } from "../types/spotifywebapi";
+import { CurrentlyPlayingResponse, SearchResponse, SingleTrackResponse, UsersQueueResponse } from "../types/spotifywebapi";
 dotenv.config();
 
 interface IProductWithPrice extends AxiosRequestConfig {
@@ -14,8 +14,6 @@ const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 
 class SpotifyWebApi {
-
-  
   //gereral Headers for the spotify WEB api
   private async Headers(channelID: number) {
     let spotifyData = await spotifyTokensDB.getSpotifyTokens(channelID);
@@ -70,11 +68,28 @@ class SpotifyWebApi {
   //get the song that is currently playing
   public async getCurrentlyPlaying(channelID: number) {
     try {
-      let response = await spotifyAPI.get("https://api.spotify.com/v1/me/player/currently-playing", {
+      let response = await spotifyAPI.get<CurrentlyPlayingResponse>("https://api.spotify.com/v1/me/player/currently-playing", {
         headers: await this.Headers(channelID),
         channelID: channelID,
       });
-      return response.data.item;
+
+      return response.data;
+    } catch (error: any) {
+      console.log(error);
+      console.log(error.response.data)
+      return;
+    }
+  }
+
+  //get playback state 
+  public async getPlaybackState(channelID: number) {
+    try {
+      let response = await spotifyAPI.get<CurrentlyPlayingResponse>("https://api.spotify.com/v1/me/player/", {
+        headers: await this.Headers(channelID),
+        channelID: channelID,
+      });
+
+      return response.data;
     } catch (error: any) {
       console.log(error);
       return;
@@ -102,7 +117,6 @@ class SpotifyWebApi {
         headers: await this.Headers(channelID),
         channelID: channelID,
       });
-      
     } catch (error: any) {
       console.log(error);
       if (error.response.data.error.status === 400) {
@@ -121,7 +135,7 @@ class SpotifyWebApi {
         channelID: channelID,
       });
       // console.log(res.data)
-      return res.data
+      return res.data;
     } catch (error: any) {
       console.log(error.response);
     }
@@ -129,7 +143,7 @@ class SpotifyWebApi {
 
   //search for a song based of query
   public async searchSong(channelID: number, query: string) {
-    console.log(`searching for ${query}`	)
+    console.log(`searching for ${query}`);
     try {
       const res = await spotifyAPI.get<SearchResponse>(`/search?q=${query}&type=track&limit=1`, {
         headers: await this.Headers(channelID),

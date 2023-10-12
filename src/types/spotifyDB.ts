@@ -21,3 +21,15 @@ export interface SpotifyIntergration {
 }
 
 export interface SpotifyIntergrationStorage extends Models.Document, SpotifyIntergration {}
+
+
+
+export interface queue {
+  songname: string;
+  songID: string;
+  channelID: number;
+  requested_by: string;
+  userID: number;
+}
+
+export interface queueStorage extends Models.Document, queue {}

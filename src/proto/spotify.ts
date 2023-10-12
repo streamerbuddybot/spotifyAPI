@@ -13,6 +13,7 @@ export class spotifyRequest extends pb_1.Message {
         userinput?: string;
         message?: string;
         action?: string;
+        username?: string;
     }) {
         super();
         pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
@@ -31,6 +32,9 @@ export class spotifyRequest extends pb_1.Message {
             }
             if ("action" in data && data.action != undefined) {
                 this.action = data.action;
+            }
+            if ("username" in data && data.username != undefined) {
+                this.username = data.username;
             }
         }
     }
@@ -64,12 +68,19 @@ export class spotifyRequest extends pb_1.Message {
     set action(value: string) {
         pb_1.Message.setField(this, 5, value);
     }
+    get username() {
+        return pb_1.Message.getFieldWithDefault(this, 6, "") as string;
+    }
+    set username(value: string) {
+        pb_1.Message.setField(this, 6, value);
+    }
     static fromObject(data: {
         channelID?: number;
         userID?: number;
         userinput?: string;
         message?: string;
         action?: string;
+        username?: string;
     }): spotifyRequest {
         const message = new spotifyRequest({});
         if (data.channelID != null) {
@@ -87,6 +98,9 @@ export class spotifyRequest extends pb_1.Message {
         if (data.action != null) {
             message.action = data.action;
         }
+        if (data.username != null) {
+            message.username = data.username;
+        }
         return message;
     }
     toObject() {
@@ -96,6 +110,7 @@ export class spotifyRequest extends pb_1.Message {
             userinput?: string;
             message?: string;
             action?: string;
+            username?: string;
         } = {};
         if (this.channelID != null) {
             data.channelID = this.channelID;
@@ -111,6 +126,9 @@ export class spotifyRequest extends pb_1.Message {
         }
         if (this.action != null) {
             data.action = this.action;
+        }
+        if (this.username != null) {
+            data.username = this.username;
         }
         return data;
     }
@@ -128,6 +146,8 @@ export class spotifyRequest extends pb_1.Message {
             writer.writeString(4, this.message);
         if (this.action.length)
             writer.writeString(5, this.action);
+        if (this.username.length)
+            writer.writeString(6, this.username);
         if (!w)
             return writer.getResultBuffer();
     }
@@ -152,6 +172,9 @@ export class spotifyRequest extends pb_1.Message {
                 case 5:
                     message.action = reader.readString();
                     break;
+                case 6:
+                    message.username = reader.readString();
+                    break;
                 default: reader.skipField();
             }
         }
@@ -168,6 +191,7 @@ export class spotifyResponse extends pb_1.Message {
     #one_of_decls: number[][] = [];
     constructor(data?: any[] | {
         status?: number;
+        statusMessage?: string;
         responseMessage?: string;
     }) {
         super();
@@ -175,6 +199,9 @@ export class spotifyResponse extends pb_1.Message {
         if (!Array.isArray(data) && typeof data == "object") {
             if ("status" in data && data.status != undefined) {
                 this.status = data.status;
+            }
+            if ("statusMessage" in data && data.statusMessage != undefined) {
+                this.statusMessage = data.statusMessage;
             }
             if ("responseMessage" in data && data.responseMessage != undefined) {
                 this.responseMessage = data.responseMessage;
@@ -187,19 +214,29 @@ export class spotifyResponse extends pb_1.Message {
     set status(value: number) {
         pb_1.Message.setField(this, 1, value);
     }
-    get responseMessage() {
+    get statusMessage() {
         return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
     }
-    set responseMessage(value: string) {
+    set statusMessage(value: string) {
         pb_1.Message.setField(this, 2, value);
+    }
+    get responseMessage() {
+        return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+    }
+    set responseMessage(value: string) {
+        pb_1.Message.setField(this, 3, value);
     }
     static fromObject(data: {
         status?: number;
+        statusMessage?: string;
         responseMessage?: string;
     }): spotifyResponse {
         const message = new spotifyResponse({});
         if (data.status != null) {
             message.status = data.status;
+        }
+        if (data.statusMessage != null) {
+            message.statusMessage = data.statusMessage;
         }
         if (data.responseMessage != null) {
             message.responseMessage = data.responseMessage;
@@ -209,10 +246,14 @@ export class spotifyResponse extends pb_1.Message {
     toObject() {
         const data: {
             status?: number;
+            statusMessage?: string;
             responseMessage?: string;
         } = {};
         if (this.status != null) {
             data.status = this.status;
+        }
+        if (this.statusMessage != null) {
+            data.statusMessage = this.statusMessage;
         }
         if (this.responseMessage != null) {
             data.responseMessage = this.responseMessage;
@@ -225,8 +266,10 @@ export class spotifyResponse extends pb_1.Message {
         const writer = w || new pb_1.BinaryWriter();
         if (this.status != 0)
             writer.writeUint32(1, this.status);
+        if (this.statusMessage.length)
+            writer.writeString(2, this.statusMessage);
         if (this.responseMessage.length)
-            writer.writeString(2, this.responseMessage);
+            writer.writeString(3, this.responseMessage);
         if (!w)
             return writer.getResultBuffer();
     }
@@ -240,6 +283,9 @@ export class spotifyResponse extends pb_1.Message {
                     message.status = reader.readUint32();
                     break;
                 case 2:
+                    message.statusMessage = reader.readString();
+                    break;
+                case 3:
                     message.responseMessage = reader.readString();
                     break;
                 default: reader.skipField();
@@ -252,6 +298,848 @@ export class spotifyResponse extends pb_1.Message {
     }
     static deserializeBinary(bytes: Uint8Array): spotifyResponse {
         return spotifyResponse.deserialize(bytes);
+    }
+}
+export class spotifySongDetailsRequest extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        channelID?: number;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("channelID" in data && data.channelID != undefined) {
+                this.channelID = data.channelID;
+            }
+        }
+    }
+    get channelID() {
+        return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+    }
+    set channelID(value: number) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    static fromObject(data: {
+        channelID?: number;
+    }): spotifySongDetailsRequest {
+        const message = new spotifySongDetailsRequest({});
+        if (data.channelID != null) {
+            message.channelID = data.channelID;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            channelID?: number;
+        } = {};
+        if (this.channelID != null) {
+            data.channelID = this.channelID;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.channelID != 0)
+            writer.writeInt32(1, this.channelID);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): spotifySongDetailsRequest {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new spotifySongDetailsRequest();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.channelID = reader.readInt32();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): spotifySongDetailsRequest {
+        return spotifySongDetailsRequest.deserialize(bytes);
+    }
+}
+export class spotifySongDetailsResponse extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        status?: number;
+        statusMessage?: string;
+        songDetails?: spotifySongDetails;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("status" in data && data.status != undefined) {
+                this.status = data.status;
+            }
+            if ("statusMessage" in data && data.statusMessage != undefined) {
+                this.statusMessage = data.statusMessage;
+            }
+            if ("songDetails" in data && data.songDetails != undefined) {
+                this.songDetails = data.songDetails;
+            }
+        }
+    }
+    get status() {
+        return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+    }
+    set status(value: number) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    get statusMessage() {
+        return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+    }
+    set statusMessage(value: string) {
+        pb_1.Message.setField(this, 2, value);
+    }
+    get songDetails() {
+        return pb_1.Message.getWrapperField(this, spotifySongDetails, 3) as spotifySongDetails;
+    }
+    set songDetails(value: spotifySongDetails) {
+        pb_1.Message.setWrapperField(this, 3, value);
+    }
+    get has_songDetails() {
+        return pb_1.Message.getField(this, 3) != null;
+    }
+    static fromObject(data: {
+        status?: number;
+        statusMessage?: string;
+        songDetails?: ReturnType<typeof spotifySongDetails.prototype.toObject>;
+    }): spotifySongDetailsResponse {
+        const message = new spotifySongDetailsResponse({});
+        if (data.status != null) {
+            message.status = data.status;
+        }
+        if (data.statusMessage != null) {
+            message.statusMessage = data.statusMessage;
+        }
+        if (data.songDetails != null) {
+            message.songDetails = spotifySongDetails.fromObject(data.songDetails);
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            status?: number;
+            statusMessage?: string;
+            songDetails?: ReturnType<typeof spotifySongDetails.prototype.toObject>;
+        } = {};
+        if (this.status != null) {
+            data.status = this.status;
+        }
+        if (this.statusMessage != null) {
+            data.statusMessage = this.statusMessage;
+        }
+        if (this.songDetails != null) {
+            data.songDetails = this.songDetails.toObject();
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.status != 0)
+            writer.writeInt32(1, this.status);
+        if (this.statusMessage.length)
+            writer.writeString(2, this.statusMessage);
+        if (this.has_songDetails)
+            writer.writeMessage(3, this.songDetails, () => this.songDetails.serialize(writer));
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): spotifySongDetailsResponse {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new spotifySongDetailsResponse();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.status = reader.readInt32();
+                    break;
+                case 2:
+                    message.statusMessage = reader.readString();
+                    break;
+                case 3:
+                    reader.readMessage(message.songDetails, () => message.songDetails = spotifySongDetails.deserialize(reader));
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): spotifySongDetailsResponse {
+        return spotifySongDetailsResponse.deserialize(bytes);
+    }
+}
+export class spotifySongDetails extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        song?: string;
+        artist?: string;
+        album?: string;
+        songID?: string;
+        songURL?: string;
+        volume?: number;
+        duration?: number;
+        progress?: number;
+        isPlaying?: boolean;
+        release_date?: string;
+        imageURL?: string;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("song" in data && data.song != undefined) {
+                this.song = data.song;
+            }
+            if ("artist" in data && data.artist != undefined) {
+                this.artist = data.artist;
+            }
+            if ("album" in data && data.album != undefined) {
+                this.album = data.album;
+            }
+            if ("songID" in data && data.songID != undefined) {
+                this.songID = data.songID;
+            }
+            if ("songURL" in data && data.songURL != undefined) {
+                this.songURL = data.songURL;
+            }
+            if ("volume" in data && data.volume != undefined) {
+                this.volume = data.volume;
+            }
+            if ("duration" in data && data.duration != undefined) {
+                this.duration = data.duration;
+            }
+            if ("progress" in data && data.progress != undefined) {
+                this.progress = data.progress;
+            }
+            if ("isPlaying" in data && data.isPlaying != undefined) {
+                this.isPlaying = data.isPlaying;
+            }
+            if ("release_date" in data && data.release_date != undefined) {
+                this.release_date = data.release_date;
+            }
+            if ("imageURL" in data && data.imageURL != undefined) {
+                this.imageURL = data.imageURL;
+            }
+        }
+    }
+    get song() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+    }
+    set song(value: string) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    get artist() {
+        return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+    }
+    set artist(value: string) {
+        pb_1.Message.setField(this, 2, value);
+    }
+    get album() {
+        return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+    }
+    set album(value: string) {
+        pb_1.Message.setField(this, 3, value);
+    }
+    get songID() {
+        return pb_1.Message.getFieldWithDefault(this, 4, "") as string;
+    }
+    set songID(value: string) {
+        pb_1.Message.setField(this, 4, value);
+    }
+    get songURL() {
+        return pb_1.Message.getFieldWithDefault(this, 5, "") as string;
+    }
+    set songURL(value: string) {
+        pb_1.Message.setField(this, 5, value);
+    }
+    get volume() {
+        return pb_1.Message.getFieldWithDefault(this, 6, 0) as number;
+    }
+    set volume(value: number) {
+        pb_1.Message.setField(this, 6, value);
+    }
+    get duration() {
+        return pb_1.Message.getFieldWithDefault(this, 7, 0) as number;
+    }
+    set duration(value: number) {
+        pb_1.Message.setField(this, 7, value);
+    }
+    get progress() {
+        return pb_1.Message.getFieldWithDefault(this, 8, 0) as number;
+    }
+    set progress(value: number) {
+        pb_1.Message.setField(this, 8, value);
+    }
+    get isPlaying() {
+        return pb_1.Message.getFieldWithDefault(this, 9, false) as boolean;
+    }
+    set isPlaying(value: boolean) {
+        pb_1.Message.setField(this, 9, value);
+    }
+    get release_date() {
+        return pb_1.Message.getFieldWithDefault(this, 10, "") as string;
+    }
+    set release_date(value: string) {
+        pb_1.Message.setField(this, 10, value);
+    }
+    get imageURL() {
+        return pb_1.Message.getFieldWithDefault(this, 11, "") as string;
+    }
+    set imageURL(value: string) {
+        pb_1.Message.setField(this, 11, value);
+    }
+    static fromObject(data: {
+        song?: string;
+        artist?: string;
+        album?: string;
+        songID?: string;
+        songURL?: string;
+        volume?: number;
+        duration?: number;
+        progress?: number;
+        isPlaying?: boolean;
+        release_date?: string;
+        imageURL?: string;
+    }): spotifySongDetails {
+        const message = new spotifySongDetails({});
+        if (data.song != null) {
+            message.song = data.song;
+        }
+        if (data.artist != null) {
+            message.artist = data.artist;
+        }
+        if (data.album != null) {
+            message.album = data.album;
+        }
+        if (data.songID != null) {
+            message.songID = data.songID;
+        }
+        if (data.songURL != null) {
+            message.songURL = data.songURL;
+        }
+        if (data.volume != null) {
+            message.volume = data.volume;
+        }
+        if (data.duration != null) {
+            message.duration = data.duration;
+        }
+        if (data.progress != null) {
+            message.progress = data.progress;
+        }
+        if (data.isPlaying != null) {
+            message.isPlaying = data.isPlaying;
+        }
+        if (data.release_date != null) {
+            message.release_date = data.release_date;
+        }
+        if (data.imageURL != null) {
+            message.imageURL = data.imageURL;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            song?: string;
+            artist?: string;
+            album?: string;
+            songID?: string;
+            songURL?: string;
+            volume?: number;
+            duration?: number;
+            progress?: number;
+            isPlaying?: boolean;
+            release_date?: string;
+            imageURL?: string;
+        } = {};
+        if (this.song != null) {
+            data.song = this.song;
+        }
+        if (this.artist != null) {
+            data.artist = this.artist;
+        }
+        if (this.album != null) {
+            data.album = this.album;
+        }
+        if (this.songID != null) {
+            data.songID = this.songID;
+        }
+        if (this.songURL != null) {
+            data.songURL = this.songURL;
+        }
+        if (this.volume != null) {
+            data.volume = this.volume;
+        }
+        if (this.duration != null) {
+            data.duration = this.duration;
+        }
+        if (this.progress != null) {
+            data.progress = this.progress;
+        }
+        if (this.isPlaying != null) {
+            data.isPlaying = this.isPlaying;
+        }
+        if (this.release_date != null) {
+            data.release_date = this.release_date;
+        }
+        if (this.imageURL != null) {
+            data.imageURL = this.imageURL;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.song.length)
+            writer.writeString(1, this.song);
+        if (this.artist.length)
+            writer.writeString(2, this.artist);
+        if (this.album.length)
+            writer.writeString(3, this.album);
+        if (this.songID.length)
+            writer.writeString(4, this.songID);
+        if (this.songURL.length)
+            writer.writeString(5, this.songURL);
+        if (this.volume != 0)
+            writer.writeInt32(6, this.volume);
+        if (this.duration != 0)
+            writer.writeInt32(7, this.duration);
+        if (this.progress != 0)
+            writer.writeInt32(8, this.progress);
+        if (this.isPlaying != false)
+            writer.writeBool(9, this.isPlaying);
+        if (this.release_date.length)
+            writer.writeString(10, this.release_date);
+        if (this.imageURL.length)
+            writer.writeString(11, this.imageURL);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): spotifySongDetails {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new spotifySongDetails();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.song = reader.readString();
+                    break;
+                case 2:
+                    message.artist = reader.readString();
+                    break;
+                case 3:
+                    message.album = reader.readString();
+                    break;
+                case 4:
+                    message.songID = reader.readString();
+                    break;
+                case 5:
+                    message.songURL = reader.readString();
+                    break;
+                case 6:
+                    message.volume = reader.readInt32();
+                    break;
+                case 7:
+                    message.duration = reader.readInt32();
+                    break;
+                case 8:
+                    message.progress = reader.readInt32();
+                    break;
+                case 9:
+                    message.isPlaying = reader.readBool();
+                    break;
+                case 10:
+                    message.release_date = reader.readString();
+                    break;
+                case 11:
+                    message.imageURL = reader.readString();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): spotifySongDetails {
+        return spotifySongDetails.deserialize(bytes);
+    }
+}
+export class spotifyQueue extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        songID?: string;
+        userID?: number;
+        songname?: string;
+        requested_by?: string;
+        channelID?: number;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("songID" in data && data.songID != undefined) {
+                this.songID = data.songID;
+            }
+            if ("userID" in data && data.userID != undefined) {
+                this.userID = data.userID;
+            }
+            if ("songname" in data && data.songname != undefined) {
+                this.songname = data.songname;
+            }
+            if ("requested_by" in data && data.requested_by != undefined) {
+                this.requested_by = data.requested_by;
+            }
+            if ("channelID" in data && data.channelID != undefined) {
+                this.channelID = data.channelID;
+            }
+        }
+    }
+    get songID() {
+        return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+    }
+    set songID(value: string) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    get userID() {
+        return pb_1.Message.getFieldWithDefault(this, 2, 0) as number;
+    }
+    set userID(value: number) {
+        pb_1.Message.setField(this, 2, value);
+    }
+    get songname() {
+        return pb_1.Message.getFieldWithDefault(this, 3, "") as string;
+    }
+    set songname(value: string) {
+        pb_1.Message.setField(this, 3, value);
+    }
+    get requested_by() {
+        return pb_1.Message.getFieldWithDefault(this, 4, "") as string;
+    }
+    set requested_by(value: string) {
+        pb_1.Message.setField(this, 4, value);
+    }
+    get channelID() {
+        return pb_1.Message.getFieldWithDefault(this, 5, 0) as number;
+    }
+    set channelID(value: number) {
+        pb_1.Message.setField(this, 5, value);
+    }
+    static fromObject(data: {
+        songID?: string;
+        userID?: number;
+        songname?: string;
+        requested_by?: string;
+        channelID?: number;
+    }): spotifyQueue {
+        const message = new spotifyQueue({});
+        if (data.songID != null) {
+            message.songID = data.songID;
+        }
+        if (data.userID != null) {
+            message.userID = data.userID;
+        }
+        if (data.songname != null) {
+            message.songname = data.songname;
+        }
+        if (data.requested_by != null) {
+            message.requested_by = data.requested_by;
+        }
+        if (data.channelID != null) {
+            message.channelID = data.channelID;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            songID?: string;
+            userID?: number;
+            songname?: string;
+            requested_by?: string;
+            channelID?: number;
+        } = {};
+        if (this.songID != null) {
+            data.songID = this.songID;
+        }
+        if (this.userID != null) {
+            data.userID = this.userID;
+        }
+        if (this.songname != null) {
+            data.songname = this.songname;
+        }
+        if (this.requested_by != null) {
+            data.requested_by = this.requested_by;
+        }
+        if (this.channelID != null) {
+            data.channelID = this.channelID;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.songID.length)
+            writer.writeString(1, this.songID);
+        if (this.userID != 0)
+            writer.writeInt32(2, this.userID);
+        if (this.songname.length)
+            writer.writeString(3, this.songname);
+        if (this.requested_by.length)
+            writer.writeString(4, this.requested_by);
+        if (this.channelID != 0)
+            writer.writeInt32(5, this.channelID);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): spotifyQueue {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new spotifyQueue();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.songID = reader.readString();
+                    break;
+                case 2:
+                    message.userID = reader.readInt32();
+                    break;
+                case 3:
+                    message.songname = reader.readString();
+                    break;
+                case 4:
+                    message.requested_by = reader.readString();
+                    break;
+                case 5:
+                    message.channelID = reader.readInt32();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): spotifyQueue {
+        return spotifyQueue.deserialize(bytes);
+    }
+}
+export class spotifyQueueRequest extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        channelID?: number;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("channelID" in data && data.channelID != undefined) {
+                this.channelID = data.channelID;
+            }
+        }
+    }
+    get channelID() {
+        return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+    }
+    set channelID(value: number) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    static fromObject(data: {
+        channelID?: number;
+    }): spotifyQueueRequest {
+        const message = new spotifyQueueRequest({});
+        if (data.channelID != null) {
+            message.channelID = data.channelID;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            channelID?: number;
+        } = {};
+        if (this.channelID != null) {
+            data.channelID = this.channelID;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.channelID != 0)
+            writer.writeInt32(1, this.channelID);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): spotifyQueueRequest {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new spotifyQueueRequest();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.channelID = reader.readInt32();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): spotifyQueueRequest {
+        return spotifyQueueRequest.deserialize(bytes);
+    }
+}
+export class spotifyQueueResponse extends pb_1.Message {
+    #one_of_decls: number[][] = [];
+    constructor(data?: any[] | {
+        status?: number;
+        statusMessage?: string;
+        queue?: spotifyQueue[];
+        totalSongs?: number;
+    }) {
+        super();
+        pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [3], this.#one_of_decls);
+        if (!Array.isArray(data) && typeof data == "object") {
+            if ("status" in data && data.status != undefined) {
+                this.status = data.status;
+            }
+            if ("statusMessage" in data && data.statusMessage != undefined) {
+                this.statusMessage = data.statusMessage;
+            }
+            if ("queue" in data && data.queue != undefined) {
+                this.queue = data.queue;
+            }
+            if ("totalSongs" in data && data.totalSongs != undefined) {
+                this.totalSongs = data.totalSongs;
+            }
+        }
+    }
+    get status() {
+        return pb_1.Message.getFieldWithDefault(this, 1, 0) as number;
+    }
+    set status(value: number) {
+        pb_1.Message.setField(this, 1, value);
+    }
+    get statusMessage() {
+        return pb_1.Message.getFieldWithDefault(this, 2, "") as string;
+    }
+    set statusMessage(value: string) {
+        pb_1.Message.setField(this, 2, value);
+    }
+    get queue() {
+        return pb_1.Message.getRepeatedWrapperField(this, spotifyQueue, 3) as spotifyQueue[];
+    }
+    set queue(value: spotifyQueue[]) {
+        pb_1.Message.setRepeatedWrapperField(this, 3, value);
+    }
+    get totalSongs() {
+        return pb_1.Message.getFieldWithDefault(this, 4, 0) as number;
+    }
+    set totalSongs(value: number) {
+        pb_1.Message.setField(this, 4, value);
+    }
+    static fromObject(data: {
+        status?: number;
+        statusMessage?: string;
+        queue?: ReturnType<typeof spotifyQueue.prototype.toObject>[];
+        totalSongs?: number;
+    }): spotifyQueueResponse {
+        const message = new spotifyQueueResponse({});
+        if (data.status != null) {
+            message.status = data.status;
+        }
+        if (data.statusMessage != null) {
+            message.statusMessage = data.statusMessage;
+        }
+        if (data.queue != null) {
+            message.queue = data.queue.map(item => spotifyQueue.fromObject(item));
+        }
+        if (data.totalSongs != null) {
+            message.totalSongs = data.totalSongs;
+        }
+        return message;
+    }
+    toObject() {
+        const data: {
+            status?: number;
+            statusMessage?: string;
+            queue?: ReturnType<typeof spotifyQueue.prototype.toObject>[];
+            totalSongs?: number;
+        } = {};
+        if (this.status != null) {
+            data.status = this.status;
+        }
+        if (this.statusMessage != null) {
+            data.statusMessage = this.statusMessage;
+        }
+        if (this.queue != null) {
+            data.queue = this.queue.map((item: spotifyQueue) => item.toObject());
+        }
+        if (this.totalSongs != null) {
+            data.totalSongs = this.totalSongs;
+        }
+        return data;
+    }
+    serialize(): Uint8Array;
+    serialize(w: pb_1.BinaryWriter): void;
+    serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+        const writer = w || new pb_1.BinaryWriter();
+        if (this.status != 0)
+            writer.writeInt32(1, this.status);
+        if (this.statusMessage.length)
+            writer.writeString(2, this.statusMessage);
+        if (this.queue.length)
+            writer.writeRepeatedMessage(3, this.queue, (item: spotifyQueue) => item.serialize(writer));
+        if (this.totalSongs != 0)
+            writer.writeInt32(4, this.totalSongs);
+        if (!w)
+            return writer.getResultBuffer();
+    }
+    static deserialize(bytes: Uint8Array | pb_1.BinaryReader): spotifyQueueResponse {
+        const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new spotifyQueueResponse();
+        while (reader.nextField()) {
+            if (reader.isEndGroup())
+                break;
+            switch (reader.getFieldNumber()) {
+                case 1:
+                    message.status = reader.readInt32();
+                    break;
+                case 2:
+                    message.statusMessage = reader.readString();
+                    break;
+                case 3:
+                    reader.readMessage(message.queue, () => pb_1.Message.addToRepeatedWrapperField(message, 3, spotifyQueue.deserialize(reader), spotifyQueue));
+                    break;
+                case 4:
+                    message.totalSongs = reader.readInt32();
+                    break;
+                default: reader.skipField();
+            }
+        }
+        return message;
+    }
+    serializeBinary(): Uint8Array {
+        return this.serialize();
+    }
+    static deserializeBinary(bytes: Uint8Array): spotifyQueueResponse {
+        return spotifyQueueResponse.deserialize(bytes);
     }
 }
 interface GrpcUnaryServiceInterface<P, R> {
@@ -288,10 +1176,30 @@ export abstract class UnimplementedSpotifyServiceService {
             requestDeserialize: (bytes: Buffer) => spotifyRequest.deserialize(new Uint8Array(bytes)),
             responseSerialize: (message: spotifyResponse) => Buffer.from(message.serialize()),
             responseDeserialize: (bytes: Buffer) => spotifyResponse.deserialize(new Uint8Array(bytes))
+        },
+        getSongDetails: {
+            path: "/SpotifyService/getSongDetails",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: spotifySongDetailsRequest) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => spotifySongDetailsRequest.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: spotifySongDetailsResponse) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => spotifySongDetailsResponse.deserialize(new Uint8Array(bytes))
+        },
+        getQueue: {
+            path: "/SpotifyService/getQueue",
+            requestStream: false,
+            responseStream: false,
+            requestSerialize: (message: spotifyQueueRequest) => Buffer.from(message.serialize()),
+            requestDeserialize: (bytes: Buffer) => spotifyQueueRequest.deserialize(new Uint8Array(bytes)),
+            responseSerialize: (message: spotifyQueueResponse) => Buffer.from(message.serialize()),
+            responseDeserialize: (bytes: Buffer) => spotifyQueueResponse.deserialize(new Uint8Array(bytes))
         }
     };
     [method: string]: grpc_1.UntypedHandleCall;
     abstract SendEvent(call: grpc_1.ServerUnaryCall<spotifyRequest, spotifyResponse>, callback: grpc_1.sendUnaryData<spotifyResponse>): void;
+    abstract getSongDetails(call: grpc_1.ServerUnaryCall<spotifySongDetailsRequest, spotifySongDetailsResponse>, callback: grpc_1.sendUnaryData<spotifySongDetailsResponse>): void;
+    abstract getQueue(call: grpc_1.ServerUnaryCall<spotifyQueueRequest, spotifyQueueResponse>, callback: grpc_1.sendUnaryData<spotifyQueueResponse>): void;
 }
 export class SpotifyServiceClient extends grpc_1.makeGenericClientConstructor(UnimplementedSpotifyServiceService.definition, "SpotifyService", {}) {
     constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
@@ -299,5 +1207,11 @@ export class SpotifyServiceClient extends grpc_1.makeGenericClientConstructor(Un
     }
     SendEvent: GrpcUnaryServiceInterface<spotifyRequest, spotifyResponse> = (message: spotifyRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<spotifyResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<spotifyResponse>, callback?: grpc_1.requestCallback<spotifyResponse>): grpc_1.ClientUnaryCall => {
         return super.SendEvent(message, metadata, options, callback);
+    };
+    getSongDetails: GrpcUnaryServiceInterface<spotifySongDetailsRequest, spotifySongDetailsResponse> = (message: spotifySongDetailsRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<spotifySongDetailsResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<spotifySongDetailsResponse>, callback?: grpc_1.requestCallback<spotifySongDetailsResponse>): grpc_1.ClientUnaryCall => {
+        return super.getSongDetails(message, metadata, options, callback);
+    };
+    getQueue: GrpcUnaryServiceInterface<spotifyQueueRequest, spotifyQueueResponse> = (message: spotifyQueueRequest, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<spotifyQueueResponse>, options?: grpc_1.CallOptions | grpc_1.requestCallback<spotifyQueueResponse>, callback?: grpc_1.requestCallback<spotifyQueueResponse>): grpc_1.ClientUnaryCall => {
+        return super.getQueue(message, metadata, options, callback);
     };
 }

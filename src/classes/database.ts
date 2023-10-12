@@ -2,7 +2,7 @@ import axios from "axios";
 import { Client, Databases, ID, Query, Permission, Role } from "node-appwrite";
 import { client } from "../utils/appwrite";
 import qs from "qs";
-import { SpotifyIntergrationStorage, SpotifyStreammerSettingStorage } from "../types/spotifyDB";
+import { SpotifyIntergrationStorage, SpotifyStreammerSettingStorage, queue, queueStorage } from "../types/spotifyDB";
 
 const database = new Databases(client);
 
@@ -94,6 +94,54 @@ class SpotifyDBclient {
       ]);
 
       return streamerSettings.documents[0];
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //get the spotify queue from database
+  async getQueue(channelID: number) {
+    try {
+      const queue = await database.listDocuments<queueStorage>("64eea021e0e4804e0d0e", "6527f88ebc9707f8bab2", [Query.equal("channelID", channelID)]);
+
+      return queue;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  async getQueueBasedOfID(channelID: number, songID: string) {
+    try {
+      const queue = await database.listDocuments<queueStorage>("64eea021e0e4804e0d0e", "6527f88ebc9707f8bab2", [
+        Query.equal("channelID", channelID),
+        Query.equal("songID", songID),
+      ]);
+
+      return queue;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //add a song to the queue
+  async addSongToQueue({ channelID, requested_by, songname, userID, songID }: queue) {
+    try {
+      const queue = await database.createDocument("64eea021e0e4804e0d0e", "6527f88ebc9707f8bab2", ID.unique(), {
+        channelID,
+        requested_by,
+        songname,
+        songID,
+        userID,
+      } as queue);
+      return queue;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //remove a song from the queue
+  async removeSongFromQueue(documentID: string) {
+    try {
+      await database.deleteDocument("64eea021e0e4804e0d0e", "6527f88ebc9707f8bab2", documentID);
     } catch (error) {
       console.log(error);
     }

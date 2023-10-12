@@ -905,7 +905,7 @@ interface CurrentPlaybackResponse
   extends CurrentlyPlayingObject,
     PlaybackObject {}
 
-interface CurrentlyPlayingResponse extends CurrentlyPlayingObject {}
+export interface CurrentlyPlayingResponse extends CurrentlyPlayingObject {}
 
 //
 // Objects from the Object Models of the Spotify Web Api, ordered alphabetically.
@@ -1828,7 +1828,7 @@ interface CurrentlyPlayingObject {
   actions: ActionsObject;
   progress_ms: number | null;
   is_playing: boolean;
-  item: TrackObjectFull | EpisodeObject | null;
+  item: TrackObjectFull 
   context: ContextObject | null;
   currently_playing_type: "track" | "episode" | "ad" | "unknown";
 }

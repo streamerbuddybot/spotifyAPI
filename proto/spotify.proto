@@ -1,25 +1,72 @@
 syntax = "proto3";
 
-
-
 message spotifyRequest {
   int32 channelID = 1;
   int32 userID = 2;
   string userinput = 3;
   string message = 4;
   string action = 5;
+  string username = 6;
 }
 
 message spotifyResponse {
   uint32 status = 1;
-  string responseMessage = 2; 
+  string statusMessage = 2;
+  string responseMessage = 3; 
 
+}
+
+message spotifySongDetailsRequest {
+  int32 channelID = 1;
+}
+
+message spotifySongDetailsResponse {
+  int32 status = 1;
+  string statusMessage = 2;
+  spotifySongDetails songDetails = 3;
+}
+
+
+
+message spotifySongDetails {
+  string song = 1;
+  string artist = 2;
+  string album = 3;
+  string songID = 4;
+  string songURL = 5;
+  int32 volume = 6;
+  int32 duration = 7;
+  int32 progress = 8;
+  bool isPlaying = 9;
+  string release_date = 10;
+  string imageURL = 11;  
+}
+
+message spotifyQueue {
+  string songID = 1;
+  int32 userID = 2;
+  string songname = 3;
+  string requested_by = 4;
+  int32 channelID = 5;
+
+}
+
+message spotifyQueueRequest {
+  int32 channelID = 1;
+}
+message spotifyQueueResponse {
+  int32 status = 1;
+  string statusMessage = 2;
+  repeated spotifyQueue queue = 3;
+  int32 totalSongs = 4; 
 }
 
 
 
 service SpotifyService {
- rpc SendEvent(spotifyRequest) returns (spotifyResponse) {}
+  rpc SendEvent(spotifyRequest) returns (spotifyResponse) {}
+  rpc getSongDetails(spotifySongDetailsRequest) returns (spotifySongDetailsResponse) {}
+  rpc getQueue(spotifyQueueRequest) returns (spotifyQueueResponse) {}
 }
 
 
