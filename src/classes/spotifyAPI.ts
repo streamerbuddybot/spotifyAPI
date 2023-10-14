@@ -154,6 +154,19 @@ class SpotifyWebApi {
       console.log(error.response.data);
     }
   }
+
+  //skip the current song
+  public async skipSong(channelID: number) {
+    try {
+      const res = await spotifyAPI.post("/me/player/next", null, {
+        headers: await this.Headers(channelID),
+        channelID: channelID,
+      });
+      return res.data;
+    } catch (error: any) {
+      console.log(error.response.data);
+    }
+  }
 }
 
 const spotifyClient = new SpotifyWebApi();

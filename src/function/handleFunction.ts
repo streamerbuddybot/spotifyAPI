@@ -9,23 +9,22 @@ import getSongURI from "./getSongURI";
 export async function handleFunction(data: spotifyFunction): Promise<string> {
   const messageArray = data.userinput.trim().split(" ");
 
+  //get the spotify song request settings
+  const spotifySettings = await spotifyDB.getStreamerSettings(data.channelID);
+
+  //check if we have the spotify settings
+  if (!spotifySettings) return "Please set up your spotify integration";
+
+  //check OnlyWhenOnline is enabled
+  if (spotifySettings.OnlyWhenOnline) {
+    //get the streamer live status
+    const isLive = await TwitchDBHandler.getStreamerLiveStatus(data.channelID.toString());
+
+    //if the streamer is offline return a message
+    if (!isLive) return "Sorry I can't take song requests right now";
+  }
   switch (data.action) {
     case "songrequest":
-      //get the spotify song request settings
-      const spotifySettings = await spotifyDB.getStreamerSettings(data.channelID);
-
-      //check if we have the spotify settings
-      if (!spotifySettings) return "Please set up your spotify integration";
-
-      //check OnlyWhenOnline is enabled
-      if (spotifySettings.OnlyWhenOnline) {
-        //get the streamer live status
-        const isLive = await TwitchDBHandler.getStreamerLiveStatus(data.channelID.toString());
-
-        //if the streamer is offline return a message
-        if (!isLive) return "Sorry I can't take song requests right now";
-      }
-
       //check if banned viewers are enabled
       if (spotifySettings.BannedViewers) {
         //check if the user is banned
@@ -95,10 +94,18 @@ export async function handleFunction(data: spotifyFunction): Promise<string> {
       }
 
       //replace the song request message variables with the song details
-      const message = CheckMessageVariabels(data.message, songDetails, data.channelID);
+      const SongRequestMessage = CheckMessageVariabels(data.message, songDetails, data.channelID);
 
       //return the message
-      return message;
+      return SongRequestMessage;
+
+    //skip a song 
+    case "skip":
+      //skip the current song
+      await spotifyClient.skipSong(data.channelID);
+            
+      //return a message
+      return data.message;
 
     default:
       return `${data.action} not found`;
@@ -132,10 +139,9 @@ export async function getSongDetails(channelID: number): Promise<spotifySongDeta
 export async function getQueue(channelID: number) {
   const res = await spotifyDB.getQueue(channelID);
 
+  if (!res) return new spotifyQueueResponse({ status: 500, statusMessage: "something went wrong" });
 
-  if(!res) return new spotifyQueueResponse({status: 500, statusMessage: "something went wrong"})
-
-  if(res.total === 0) return new spotifyQueueResponse({status: 200, statusMessage: "queue is empty", totalSongs: res.total})
+  if (res.total === 0) return new spotifyQueueResponse({ status: 200, statusMessage: "queue is empty", totalSongs: res.total });
 
   const queue = res.documents.map((song) => {
     return new spotifyQueue({
@@ -147,7 +153,7 @@ export async function getQueue(channelID: number) {
     });
   });
 
-  console.log(queue)
+  console.log(queue);
 
   const queueReponse = new spotifyQueueResponse({
     status: 200,
